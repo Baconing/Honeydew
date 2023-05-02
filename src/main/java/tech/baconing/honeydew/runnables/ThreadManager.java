@@ -6,7 +6,9 @@ import tech.baconing.honeydew.Honeydew;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class ThreadManager extends Thread {
@@ -21,6 +23,7 @@ public class ThreadManager extends Thread {
     private final int maxEndAttempts = 5;
 
     private boolean running = true;
+    private boolean ended = false;
 
     @Override
     public void run() {
@@ -64,7 +67,7 @@ public class ThreadManager extends Thread {
                 }
             }
         }
-        logger.info("ThreadManager ended.");
+        ended = true;
     }
 
     public synchronized void add(EndableRunnable runnable) {
@@ -72,8 +75,17 @@ public class ThreadManager extends Thread {
         queue.offer(runnable);
     }
 
-    public synchronized void end() {
+    public synchronized Future<String> end() {
+        CompletableFuture<String> future = new CompletableFuture<>();
         logger.info("Ending ThreadManager...");
         running = false;
+        while (true) {
+            if (ended) {
+                break;
+            }
+        }
+        future.complete("ThreadManager ended.");
+        logger.info("ThreadManager ended.");
+        return future;
     }
 }

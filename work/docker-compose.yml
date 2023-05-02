@@ -1,0 +1,26 @@
+services:
+  db:
+    # mariddb w/ phpmyadmin
+    image: mariadb:10.3
+    container_name: db
+    restart: unless-stopped
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: honeydew
+        MYSQL_USER: honeydew
+        MYSQL_PASSWORD: honeydew
+    ports:
+        - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"
+    links:
+      - db

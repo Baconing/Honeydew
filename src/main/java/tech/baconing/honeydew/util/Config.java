@@ -18,9 +18,10 @@ public class Config {
     protected static GsonBuilder jsonBuilder = new GsonBuilder();
     protected static Gson json = jsonBuilder.create();
 
+    // Bot
     private String token  = "";
 
-    //DATABASE CONFIGURATION
+    // Database
     private String address = "";
     private int port = 0;
     private String username = "";
@@ -28,6 +29,8 @@ public class Config {
     private String database = "";
     private int maxConnections = 10;
 
+    // Legacy Commands
+    private String legacyPrefix = "!";
 
 
     public static synchronized Config getConfig() {
@@ -86,26 +89,32 @@ public class Config {
             logger.fatal("Missing token, please fill out config.json and restart the bot.");
             return false;
         }
+
         if (config.getAddress().length() == 0) {
             logger.fatal("Missing database address, please fill out config.json and restart the bot.");
             return false;
         }
+
         if (config.getPort() < 1 || config.getPort() > 65535) {
             logger.fatal("Database port out of range (1-65535), please fill out config.json and restart the bot.");
             return false;
         }
+
         if (config.getUsername().length() == 0) {
             logger.fatal("Missing database username, please fill out config.json and restart the bot.");
             return false;
         }
+
         if (config.getPassword().length() == 0) {
             logger.fatal("Missing database password, please fill out config.json and restart the bot.");
             return false;
         }
+
         if (config.getDatabase().length() == 0) {
             logger.fatal("Missing database name, please fill out config.json and restart the bot.");
             return false;
         }
+
         if (config.getMaxConnections() < 1) {
             logger.fatal("Max connections must be greater than 0, please fill out config.json and restart the bot.");
             return false;
@@ -139,5 +148,9 @@ public class Config {
 
     public synchronized int getMaxConnections() {
         return maxConnections;
+    }
+
+    public synchronized String getLegacyPrefix() {
+        return legacyPrefix;
     }
 }

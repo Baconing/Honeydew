@@ -6,8 +6,9 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import tech.baconing.honeydew.Honeydew;
 import tech.baconing.honeydew.commands.Command;
+import tech.baconing.honeydew.commands.LegacyCommand;
+import tech.baconing.honeydew.commands.currency.BalanceCommand;
 import tech.baconing.honeydew.commands.miscellaneous.TestCommand;
-import tech.baconing.honeydew.commands.moderation.BanCommand;
 
 import java.util.HashMap;
 
@@ -15,16 +16,19 @@ public class RegisterCommands extends EndableRunnable {
     private final static Logger logger = LogManager.getLogger(RegisterCommands.class);
 
     private static HashMap<CommandData, Command> commands = new HashMap<>();
+    private static HashMap<String, LegacyCommand> legacyCommands = new HashMap<>();
 
     @Override
     public void run() {
         if (isRunning()) {
             logger.info("Registering commands...");
             commands.put(new TestCommand().getCommandData(), new TestCommand());
-            commands.put(new BanCommand().getCommandData(), new BanCommand());
+            commands.put(new BalanceCommand().getCommandData(), new BalanceCommand());
 
             for (CommandData commandData : commands.keySet()) {
-                Honeydew.getJda().upsertCommand(commandData).queue();
+                Honeydew.getJda().getShards().forEach(jda -> {
+                    jda.upsertCommand(commandData).queue();
+                });
                 logger.trace("Registered command: " + commandData.getName());
             }
 
@@ -35,6 +39,9 @@ public class RegisterCommands extends EndableRunnable {
 //            });
 
             logger.info("Registered commands.");
+
+            logger.info("Registering legacy commands...");
+            logger.info("Registered legacy commands.");
         }
         stopped = true;
     }
@@ -61,5 +68,14 @@ public class RegisterCommands extends EndableRunnable {
 
     public static HashMap<CommandData, Command> getCommands() {
         return commands;
+    }
+
+    @Nullable
+    public static LegacyCommand getLegacyCommand(String name) {
+        return legacyCommands.get(name);
+    }
+
+    public static HashMap<String, LegacyCommand> getLegacyCommands() {
+        return legacyCommands;
     }
 }

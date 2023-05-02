@@ -43,3 +43,6 @@ bin/
 
 ./work
 ./work/*
+./work/
+/work/
+/work/*
