@@ -1,12 +1,10 @@
 package tech.baconing.honeydew.commands.currency;
 
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import tech.baconing.honeydew.commands.AutoCompleteableCommand;
 import tech.baconing.honeydew.commands.Command;
 import tech.baconing.honeydew.entities.UserEntity;
 import tech.baconing.honeydew.runnables.CacheManager;
@@ -33,6 +31,6 @@ public class BalanceCommand implements Command {
 
     @Override
     public String getCategory() {
-        return null;
+        return "currency";
     }
 }

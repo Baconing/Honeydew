@@ -13,7 +13,10 @@ public class JsonUtils {
         return gson.toJson(map);
     }
 
-    public static Map<Object, Object> mapFromJson(String json) {
+    public static HashMap mapFromJson(String json) {
+        if (json == null) {
+            return new HashMap();
+        }
         return gson.fromJson(json, HashMap.class);
     }
 
@@ -21,7 +24,7 @@ public class JsonUtils {
         return gson.toJson(list);
     }
 
-    public static ArrayList<Object> listFromJson(String json) {
+    public static ArrayList listFromJson(String json) {
         return gson.fromJson(json, ArrayList.class);
     }
 

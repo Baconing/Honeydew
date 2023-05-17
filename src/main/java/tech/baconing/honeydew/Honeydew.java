@@ -1,15 +1,10 @@
 package tech.baconing.honeydew;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
-import okhttp3.Cache;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tech.baconing.honeydew.entities.GlobalConfigEntity;
 import tech.baconing.honeydew.entities.UserEntity;
 import tech.baconing.honeydew.runnables.CacheManager;
 import tech.baconing.honeydew.runnables.RegisterListeners;
@@ -18,7 +13,6 @@ import tech.baconing.honeydew.util.Config;
 import tech.baconing.honeydew.util.Database;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 
 public class Honeydew {
     private static final Logger logger = LogManager.getLogger(Honeydew.class);
@@ -32,14 +26,10 @@ public class Honeydew {
         jda = DefaultShardManagerBuilder.createDefault(Config.getConfig().getToken()).build();
         threadManager.add(new RegisterListeners());
         Database.init();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                threadManager.end().wait();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            jda.shutdown();
-        }));
+
+        if (CacheManager.getGlobalConfigEntity() == null) {
+            CacheManager.saveGlobalConfigEntity(new GlobalConfigEntity());
+        }
 
         UserEntity asd = new UserEntity("521808271368126467");
         asd.setBalance(100L);

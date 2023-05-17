@@ -1,13 +1,16 @@
 package tech.baconing.honeydew.runnables;
 
+import org.jetbrains.annotations.Nullable;
+import tech.baconing.honeydew.entities.GlobalConfigEntity;
 import tech.baconing.honeydew.entities.UserEntity;
 import tech.baconing.honeydew.util.Database;
 
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CacheManager extends EndableRunnable {
-    private static HashMap<String, UserEntity> userCache = new HashMap<>();
+    private static final ConcurrentHashMap<String, UserEntity> userCache = new ConcurrentHashMap<>();
+    private static GlobalConfigEntity globalConfigCache;
 
     @Override
     public void run() {
@@ -33,9 +36,19 @@ public class CacheManager extends EndableRunnable {
                     }
                 }
             }
+
+            if (globalConfigCache != null && globalConfigCache.getNoAccessEpoch() != 0L && System.currentTimeMillis() - globalConfigCache.getNoAccessEpoch() >= 90000) {
+                try {
+                    Database.saveGlobalConfigEntity(globalConfigCache);
+                    globalConfigCache = null;
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
+    @Nullable
     public static UserEntity getUserEntity(String id) {
         if (userCache.containsKey(id)) {
             return userCache.get(id);
@@ -52,6 +65,22 @@ public class CacheManager extends EndableRunnable {
 
     public static void saveUserEntity(UserEntity userEntity) {
         userCache.put(userEntity.getId(), userEntity);
+    }
+
+    @Nullable
+    public static GlobalConfigEntity getGlobalConfigEntity() {
+        if (globalConfigCache == null) {
+            try {
+                globalConfigCache = Database.getGlobalConfigEntity();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return globalConfigCache;
+    }
+
+    public static void saveGlobalConfigEntity(GlobalConfigEntity globalConfigEntity) {
+        globalConfigCache = globalConfigEntity;
     }
 
     @Override
